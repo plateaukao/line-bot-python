@@ -34,6 +34,13 @@ from linebot.http_client import (
         HttpClient, RequestsHttpClient,RequestsHttpResponse
 )
 
+from chatterbot import ChatBot
+from chatterbot.trainers import ChatterBotCorpusTrainer
+
+english_bot = ChatBot("English Bot")
+english_bot.set_trainer(ChatterBotCorpusTrainer)
+english_bot.train("chatterbot.corpus.english")
+
 app = Flask(__name__)
 
 proxies = {
@@ -103,13 +110,20 @@ def callback():
         if not isinstance(event.message, TextMessage):
             continue
 
+        text = event.message.text
         userId = event.source.sender_id
         profile = line_bot_api.get_profile(userId)
 
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text="@" + profile.display_name + ": " + event.message.text)
-        )
+        if text.startswith("e "):
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="@" + profile.display_name + ": " + event.message.text)
+            )
+        elif text.startswith("b "):
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=english_bot.get_response(text[2:]))
+            )
 
         #line_bot_api.push_message( userId, TextSendMessage(text='push yo, ' + profile.display_name))
 
