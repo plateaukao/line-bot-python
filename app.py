@@ -39,7 +39,7 @@ from chatterbot.trainers import ChatterBotCorpusTrainer
 
 english_bot = ChatBot("English Bot")
 english_bot.set_trainer(ChatterBotCorpusTrainer)
-english_bot.train("chatterbot.corpus.english")
+english_bot.train("chatterbot.corpus.english.conversations")
 
 app = Flask(__name__)
 
