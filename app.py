@@ -55,7 +55,7 @@ def callback():
 
     # get request body as text
     body = request.get_data(as_text=True)
-    app.logger.info("Request body: " + body)
+    print "Request body: " + body
 
     # parse webhook body
     try:
@@ -75,6 +75,8 @@ def callback():
             TextSendMessage(text=event.message.text)
         )
 
+        print event.source
+
     return 'OK'
 
 
@@ -82,7 +84,7 @@ if __name__ == "__main__":
     arg_parser = ArgumentParser(
         usage='Usage: python ' + __file__ + ' [--port <port>] [--help]'
     )
-    arg_parser.add_argument('-p', '--port', default=8000, help='port')
+    arg_parser.add_argument('-p', '--port', default=80, help='port')
     arg_parser.add_argument('-d', '--debug', default=False, help='debug')
     options = arg_parser.parse_args()
 
