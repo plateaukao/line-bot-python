@@ -75,7 +75,12 @@ def callback():
             TextSendMessage(text=event.message.text)
         )
 
-        print event.source
+        userId = event.source.userId
+        profile = line_bot_api.get_profile(userId)
+        line_bot_api.push_message(
+                userId,
+                TextSendMessage(text='push yo, ' + profile.display_name)
+        )
 
     return 'OK'
 
