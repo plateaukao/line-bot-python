@@ -31,7 +31,7 @@ from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
 from linebot.http_client import (
-        HttpClient, RequestsHttpClient
+        HttpClient, RequestsHttpClient,RequestsHttpResponse
 )
 
 app = Flask(__name__)
