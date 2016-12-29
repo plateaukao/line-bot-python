@@ -34,13 +34,6 @@ from linebot.http_client import (
         HttpClient, RequestsHttpClient,RequestsHttpResponse
 )
 
-from chatterbot import ChatBot
-from chatterbot.trainers import ChatterBotCorpusTrainer
-
-english_bot = ChatBot("English Bot")
-english_bot.set_trainer(ChatterBotCorpusTrainer)
-english_bot.train("chatterbot.corpus.english.conversations")
-
 app = Flask(__name__)
 
 proxies = {
@@ -118,11 +111,6 @@ def callback():
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text="@" + profile.display_name + ": " + event.message.text)
-            )
-        else:
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text=str(english_bot.get_response(text[2:])))
             )
 
         #line_bot_api.push_message( userId, TextSendMessage(text='push yo, ' + profile.display_name))
