@@ -55,7 +55,7 @@ def callback():
 
     # get request body as text
     body = request.get_data(as_text=True)
-    print "Request body: " + body
+    #print "Request body: " + body
 
     # parse webhook body
     try:
