@@ -119,10 +119,10 @@ def callback():
                 event.reply_token,
                 TextSendMessage(text="@" + profile.display_name + ": " + event.message.text)
             )
-        elif text.startswith("b "):
+        else:
             line_bot_api.reply_message(
                 event.reply_token,
-                TextSendMessage(text=english_bot.get_response(text[2:]))
+                TextSendMessage(text=str(english_bot.get_response(text[2:])))
             )
 
         #line_bot_api.push_message( userId, TextSendMessage(text='push yo, ' + profile.display_name))
