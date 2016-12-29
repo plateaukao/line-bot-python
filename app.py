@@ -16,6 +16,8 @@ from __future__ import unicode_literals
 
 import os
 import sys
+import requests
+import os
 from argparse import ArgumentParser
 
 from flask import Flask, request, abort
@@ -31,6 +33,35 @@ from linebot.models import (
 
 app = Flask(__name__)
 
+proxies = {
+        "http": os.environ['QUOTAGUARDSTATIC_URL'],
+        "https": os.environ['QUOTAGUARDSTATIC_URL']
+        }
+
+class MyRequestsHttpClient(RequestsHttpClient):
+    def __init__(self, timeout=HttpClient.DEFAULT_TIMEOUT):
+        super(RequestsHttpClient, self).__init__(timeout)
+
+    def get(self, url, headers=None, params=None, stream=False, timeout=None):
+        if timeout is None:
+            timeout = self.timeout
+
+        response = requests.get(
+            url, headers=headers, params=params, stream=stream, timeout=timeout, proxies = proxies
+        )
+
+        return RequestsHttpResponse(response)
+
+    def post(self, url, headers=None, data=None, timeout=None):
+        if timeout is None:
+            timeout = self.timeout
+
+        response = requests.post(
+            url, headers=headers, data=data, timeout=timeout, proxies = proxies
+        )
+
+        return RequestsHttpResponse(response)
+
 # get channel_secret and channel_access_token from your environment variable
 channel_secret = "e37fb3dbdef6a04f07cded58e3333f38"
 channel_access_token = "IlQKA+p8nuk2tQWFI2rAUmIT/6Eewpse8o3wtSY3g0vqmO9XiygI+UlnsxvpwDqQL1DpmHQ3mS0YvIOmSQkeqohdLzs1JYGiwERQ9hi/k9NP0wQJvSlpJ1o8NqbXyXudoHodBOFCvlWR/jNnIhnYXgdB04t89/1O/w1cDnyilFU="
@@ -41,9 +72,8 @@ if channel_access_token is None:
     print('Specify LINE_CHANNEL_ACCESS_TOKEN as environment variable.')
     sys.exit(1)
 
-line_bot_api = LineBotApi(channel_access_token)
+line_bot_api = LineBotApi(channel_access_token, http_client=MyRequestsHttpClient)
 parser = WebhookParser(channel_secret)
-
 
 @app.route("/")
 def main():
