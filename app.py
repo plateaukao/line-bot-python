@@ -75,7 +75,7 @@ def callback():
             TextSendMessage(text=event.message.text)
         )
 
-        userId = event.source.userId
+        userId = event.source.sender_id
         profile = line_bot_api.get_profile(userId)
         line_bot_api.push_message(
                 userId,
