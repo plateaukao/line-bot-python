@@ -70,17 +70,15 @@ def callback():
         if not isinstance(event.message, TextMessage):
             continue
 
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=event.message.text)
-        )
-
         userId = event.source.sender_id
         profile = line_bot_api.get_profile(userId)
-        line_bot_api.push_message(
-                userId,
-                TextSendMessage(text='push yo, ' + profile.display_name)
+
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=profile.display_name + " " + event.message.text)
         )
+
+        #line_bot_api.push_message( userId, TextSendMessage(text='push yo, ' + profile.display_name))
 
     return 'OK'
 
