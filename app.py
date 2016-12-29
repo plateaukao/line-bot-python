@@ -108,7 +108,7 @@ def callback():
 
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=profile.display_name + " " + event.message.text)
+            TextSendMessage(text="@" + profile.display_name + ": " + event.message.text)
         )
 
         #line_bot_api.push_message( userId, TextSendMessage(text='push yo, ' + profile.display_name))
