@@ -32,10 +32,7 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, ImageMessage, ImageSendMessage
-)
-from linebot.sources import (
-    SourceUser
+    MessageEvent, TextMessage, TextSendMessage, ImageMessage, ImageSendMessage, SourceUser
 )
 
 from linebot.http_client import (
