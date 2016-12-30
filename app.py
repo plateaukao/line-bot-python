@@ -88,7 +88,7 @@ def processTextMessage(event):
     if results:
         line_bot_api.reply_message(
             event.reply_token,
-            ImageSendMessage(results[0]['url']))
+            ImageSendMessage(original_content_url=results[0]['url']))
     else:
         line_bot_api.reply_message(
             event.reply_token,
