@@ -27,11 +27,11 @@ def ocr_with_content(content):
 	conn = httplib.HTTPSConnection('api.projectoxford.ai')
 	conn.request("POST", "/vision/v1.0/ocr?%s" % params, content, binary_headers)
 	response = conn.getresponse()
-        print response
+        #print response
 	data = response.read()
 	conn.close()
 	text = get_ocr_string(data)
-        print 'str',text
+        #print 'str',text
         return text
 
     except Exception as e:
@@ -39,7 +39,7 @@ def ocr_with_content(content):
 	print "error",e
 
 def ocr(url):
-    print url
+    #print url
     try:
 	conn = httplib.HTTPSConnection('api.projectoxford.ai')
 	conn.request("POST", "/vision/v1.0/ocr?%s" % params, "{'url':'%s'}" % url, json_headers)
@@ -51,7 +51,7 @@ def ocr(url):
 	traceback.print_exc()
 
 def get_ocr_string(jsonstring):
-    print jsonstring
+    #print jsonstring
     data = json.loads(jsonstring)
     output = ""
     for r in data['regions']:
@@ -68,4 +68,4 @@ if __name__ == "__main__":
     options = arg_parser.parse_args()
 
     data = ocr(options.url)
-    print get_ocr_string(data)
+    #print get_ocr_string(data)
