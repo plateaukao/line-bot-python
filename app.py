@@ -19,6 +19,7 @@ import sys
 import requests
 import os
 from argparse import ArgumentParser
+import msocr
 
 from flask import Flask, request, abort
 from linebot import (
@@ -28,7 +29,7 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage,
+    MessageEvent, TextMessage, TextSendMessage, ImageMessage 
 )
 from linebot.http_client import (
         HttpClient, RequestsHttpClient,RequestsHttpResponse
@@ -68,12 +69,6 @@ class MyRequestsHttpClient(RequestsHttpClient):
 # get channel_secret and channel_access_token from your environment variable
 channel_secret = "e37fb3dbdef6a04f07cded58e3333f38"
 channel_access_token = "IlQKA+p8nuk2tQWFI2rAUmIT/6Eewpse8o3wtSY3g0vqmO9XiygI+UlnsxvpwDqQL1DpmHQ3mS0YvIOmSQkeqohdLzs1JYGiwERQ9hi/k9NP0wQJvSlpJ1o8NqbXyXudoHodBOFCvlWR/jNnIhnYXgdB04t89/1O/w1cDnyilFU="
-if channel_secret is None:
-    print('Specify LINE_CHANNEL_SECRET as environment variable.')
-    sys.exit(1)
-if channel_access_token is None:
-    print('Specify LINE_CHANNEL_ACCESS_TOKEN as environment variable.')
-    sys.exit(1)
 
 line_bot_api = LineBotApi(channel_access_token, http_client=MyRequestsHttpClient)
 parser = WebhookParser(channel_secret)
@@ -100,18 +95,26 @@ def callback():
     for event in events:
         if not isinstance(event, MessageEvent):
             continue
-        if not isinstance(event.message, TextMessage):
-            continue
+        if isinstance(event.message, TextMessage):
+            userId = event.source.sender_id
+            profile = line_bot_api.get_profile(userId)
 
-        userId = event.source.sender_id
-        profile = line_bot_api.get_profile(userId)
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="@" + profile.display_name + ": " + event.message.text)
+            )
 
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text="@" + profile.display_name + ": " + event.message.text)
-        )
+            #line_bot_api.push_message( userId, TextSendMessage(text='push yo, ' + profile.display_name))
+        elif isinstance(event.message, ImageMessage):
+            print "image message type"
+            message_content = line_bot_api.get_message_content(event.message.id)
+            data = message_content.data
+            res = msocr.ocr_with_content(data)
 
-        #line_bot_api.push_message( userId, TextSendMessage(text='push yo, ' + profile.display_name))
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=res)
+            )
 
     return 'OK'
 
