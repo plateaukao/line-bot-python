@@ -83,7 +83,7 @@ def processTextMessage(event):
     userId = event.source.sender_id
     profile = line_bot_api.get_profile(userId)
 
-    results = db_access.findImages(userId, res) 
+    results = db_access.findImageWithCaption(userId, res) 
     if results:
         line_bot_api.reply_message(
             event.reply_token,
