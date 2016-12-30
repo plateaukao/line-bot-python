@@ -123,6 +123,12 @@ def processImageMessage(event):
     # get ocr text
     res = msocr.ocr_with_content(image_binary)
 
+    if not res or res == "":
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="can't find words"))
+        return
+
     # save image to cloudinary
     fp = open("tmp_img", "wb")
     fp.write(image_binary)
