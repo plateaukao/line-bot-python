@@ -38,6 +38,7 @@ from linebot.models import (
 from linebot.http_client import (
         HttpClient, RequestsHttpClient,RequestsHttpResponse
 )
+from linebot.exceptions import ( LineBotApiError)
 
 from MyRequestsHttpClient import MyRequestsHttpClient
 
@@ -90,9 +91,13 @@ def processTextMessage(event):
         print original_url
         preview_url = image_management.getPreviewImage(results[0]['imageId'])
         print preview_url
-        line_bot_api.reply_message(
-            event.reply_token,
-            ImageSendMessage(original_content_url=original_url , preview_image_url=preview_url))
+        try:
+            line_bot_api.reply_message(
+                event.reply_token,
+                ImageSendMessage(original_content_url=original_url , preview_image_url=preview_url))
+        except LineBotApiError as e:
+            print(e.status_code)
+            print(e.error.message)
     else:
         line_bot_api.reply_message(
             event.reply_token,
