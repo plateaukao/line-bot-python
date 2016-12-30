@@ -34,6 +34,9 @@ from linebot.exceptions import (
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage, ImageMessage, ImageSendMessage
 )
+from linebot.sources import (
+    SourceUser
+)
 
 from linebot.http_client import (
         HttpClient, RequestsHttpClient,RequestsHttpResponse
@@ -69,7 +72,6 @@ def callback():
     except InvalidSignatureError:
         abort(400)
 
-    # if event is MessageEvent and message is TextMessage, then echo text
     for event in events:
         if not isinstance(event, MessageEvent):
             continue
@@ -83,10 +85,9 @@ def callback():
 def processTextMessage(event):
     userId = event.source.sender_id
     text = event.message.text
-    profile = line_bot_api.get_profile(userId)
 
     results = db_access.findImageWithCaption(userId, text) 
-    if results and results.count > 0:
+    if results and results.count() > 0:
         original_url = results[0]['url']
         print original_url
         preview_url = image_management.getPreviewImage(results[0]['imageId'])
@@ -99,9 +100,14 @@ def processTextMessage(event):
             print(e.status_code)
             print(e.error.message)
     else:
+        prefix = ""
+        if isinstance(event.source, SourceUser):
+            profile = line_bot_api.get_profile(userId)
+            prefix = "@" + profile.display_name + ": "
+
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text="@" + profile.display_name + ": " + text))
+            TextSendMessage(text=prefix + text))
 
         #line_bot_api.push_message( userId, TextSendMessage(text='push yo, ' + profile.display_name))
 
