@@ -19,8 +19,10 @@ import sys
 import requests
 import os
 from argparse import ArgumentParser
+
 import msocr
 import image_management
+import db_access
 
 from flask import Flask, request, abort
 from linebot import (
@@ -99,7 +101,10 @@ def processImageMessage(event):
     fp = open("tmp_img", "wb")
     fp.write(image_binary)
     fp.close()
-    image_management.upload(userId, "tmp_img",res)
+    url, imageId = image_management.upload(userId, "tmp_img",res)
+
+    # save image to db
+    db_access.addImage(userId, imageId, url, res) 
 
     # send ocr text message
     line_bot_api.reply_message(
