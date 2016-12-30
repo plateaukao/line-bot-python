@@ -83,16 +83,19 @@ def processTextMessage(event):
     userId = event.source.sender_id
     text = event.message.text
 
-    results = db_access.findImageWithCaption(userId, text) 
+    results = db_access.findImageWithCaption(userId, text).limit(5)
     if results and results.count() > 0:
-        original_url = results[0]['url']
-        #print original_url
-        preview_url = image_management.getPreviewImage(results[0]['imageId'])
-        #print preview_url
+        images = []
+        for r in results:
+            original_url = r['url']
+            #print original_url
+            preview_url = image_management.getPreviewImage(r['imageId'])
+            #print preview_url
+            image = ImageSendMessage(original_content_url=original_url , preview_image_url=preview_url)
+            images.append(image)
         try:
-            line_bot_api.reply_message(
-                event.reply_token,
-                ImageSendMessage(original_content_url=original_url , preview_image_url=preview_url))
+            line_bot_api.reply_message( event.reply_token,images)
+
         except LineBotApiError as e:
             print(e.status_code)
             print(e.error.message)
