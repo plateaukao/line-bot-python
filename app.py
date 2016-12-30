@@ -119,7 +119,6 @@ def callback():
                 event.reply_token,
                 TextSendMessage(text=res)
             )
-
     return 'OK'
 
 
