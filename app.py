@@ -106,7 +106,11 @@ def callback():
 
             #line_bot_api.push_message( userId, TextSendMessage(text='push yo, ' + profile.display_name))
         elif isinstance(event.message, ImageMessage):
-            print "image message type"
+            #print "image message type"
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="image message type")
+            )
             message_content = line_bot_api.get_message_content(event.message.id)
             data = message_content.data
             res = msocr.ocr_with_content(data)
