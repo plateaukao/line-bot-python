@@ -112,7 +112,7 @@ def callback():
                 TextSendMessage(text="image message type")
             )
             message_content = line_bot_api.get_message_content(event.message.id)
-            data = message_content.data
+            data = message_content.content
             res = msocr.ocr_with_content(data)
 
             line_bot_api.reply_message(
