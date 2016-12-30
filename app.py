@@ -32,7 +32,7 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, ImageMessage 
+    MessageEvent, TextMessage, TextSendMessage, ImageMessage, ImageSendMessage
 )
 
 from linebot.http_client import (
@@ -73,19 +73,27 @@ def callback():
         if not isinstance(event, MessageEvent):
             continue
         if isinstance(event.message, TextMessage):
-            userId = event.source.sender_id
-            profile = line_bot_api.get_profile(userId)
-
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text="@" + profile.display_name + ": " + event.message.text)
-            )
-
-            #line_bot_api.push_message( userId, TextSendMessage(text='push yo, ' + profile.display_name))
+            processTextMessage(event)
         elif isinstance(event.message, ImageMessage):
             processImageMessage(event)
 
     return 'OK'
+
+def processTextMessage(event):
+    userId = event.source.sender_id
+    profile = line_bot_api.get_profile(userId)
+
+    results = db_access.findImages(userId, res) 
+    if results:
+        line_bot_api.reply_message(
+            event.reply_token,
+            ImageSendMessage(results[0]['url']))
+    else:
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="@" + profile.display_name + ": " + event.message.text))
+
+        #line_bot_api.push_message( userId, TextSendMessage(text='push yo, ' + profile.display_name))
 
 def processImageMessage(event):
     userId = event.source.sender_id
