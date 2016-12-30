@@ -101,7 +101,7 @@ def processImageMessage(event):
     fp = open("tmp_img", "wb")
     fp.write(image_binary)
     fp.close()
-    url, imageId = image_management.upload(userId, "tmp_img",res)
+    url, imageId = image_management.upload(userId, "tmp_img")
 
     # save image to db
     db_access.addImage(userId, imageId, url, res) 
