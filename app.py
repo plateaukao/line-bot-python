@@ -125,7 +125,7 @@ def processImageMessage(event):
     fp = open("tmp_img", "wb")
     fp.write(image_binary)
     fp.close()
-    uploader.upload(userId, "tmp_img",res)
+    image_management.upload(userId, "tmp_img",res)
 
     # send ocr text message
     line_bot_api.reply_message(
