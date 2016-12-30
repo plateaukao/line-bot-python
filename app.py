@@ -20,6 +20,7 @@ import requests
 import os
 from argparse import ArgumentParser
 import msocr
+import image_management
 
 from flask import Flask, request, abort
 from linebot import (
@@ -106,16 +107,31 @@ def callback():
 
             #line_bot_api.push_message( userId, TextSendMessage(text='push yo, ' + profile.display_name))
         elif isinstance(event.message, ImageMessage):
-            message_content = line_bot_api.get_message_content(event.message.id)
-            data = message_content.content
-            res = msocr.ocr_with_content(data)
+            processImageMessage(event)
 
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text=res)
-            )
     return 'OK'
 
+def processImageMessage(event):
+    userId = event.source.sender_id
+
+    # get binary
+    message_content = line_bot_api.get_message_content(event.message.id)
+    image_binary = message_content.content
+
+    # get ocr text
+    res = msocr.ocr_with_content(image_binary)
+
+    # save image to cloudinary
+    fp = open("tmp_img", "wb")
+    fp.write(image_binary)
+    fp.close()
+    uploader.upload(userId, "tmp_img",res)
+
+    # send ocr text message
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=res)
+    )
 
 if __name__ == "__main__":
     arg_parser = ArgumentParser(
