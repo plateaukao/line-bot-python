@@ -86,9 +86,9 @@ def processTextMessage(event):
     results = db_access.findImageWithCaption(userId, text) 
     if results and results.count() > 0:
         original_url = results[0]['url']
-        print original_url
+        #print original_url
         preview_url = image_management.getPreviewImage(results[0]['imageId'])
-        print preview_url
+        #print preview_url
         try:
             line_bot_api.reply_message(
                 event.reply_token,
@@ -101,6 +101,8 @@ def processTextMessage(event):
         if isinstance(event.source, SourceUser):
             profile = line_bot_api.get_profile(userId)
             prefix = "@" + profile.display_name + ": "
+        else:
+            return
 
         line_bot_api.reply_message(
             event.reply_token,
