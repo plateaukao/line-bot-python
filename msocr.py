@@ -2,6 +2,7 @@
 import httplib, urllib, base64
 from argparse import ArgumentParser
 import json
+import traceback
 
 json_headers = {
     # Request headers
@@ -11,7 +12,7 @@ json_headers = {
 
 binary_headers = {
     # Request headers
-    'Content-Type': 'multipart/form-data',
+    'Content-Type': 'application/octet-stream',
     'Ocp-Apim-Subscription-Key': '26d51ac57037430ca49b641fd4880df7',
 }
 
@@ -22,16 +23,20 @@ params = urllib.urlencode({
 })
 
 def ocr_with_content(content):
-    print "ocr_with_content"
     try:
 	conn = httplib.HTTPSConnection('api.projectoxford.ai')
 	conn.request("POST", "/vision/v1.0/ocr?%s" % params, content, binary_headers)
 	response = conn.getresponse()
+        print response
 	data = response.read()
 	conn.close()
-	return get_ocr_string(data)
+	text = get_ocr_string(data)
+        print 'str',text
+        return text
+
     except Exception as e:
-	print("[Errno {0}] {1}".format(e.errno, e.strerror))
+	traceback.print_exc()
+	print "error",e
 
 def ocr(url):
     print url
@@ -43,9 +48,10 @@ def ocr(url):
 	conn.close()
 	return data
     except Exception as e:
-	print("[Errno {0}] {1}".format(e.errno, e.strerror))
+	traceback.print_exc()
 
 def get_ocr_string(jsonstring):
+    print jsonstring
     data = json.loads(jsonstring)
     output = ""
     for r in data['regions']:
