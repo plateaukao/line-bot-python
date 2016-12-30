@@ -81,9 +81,10 @@ def callback():
 
 def processTextMessage(event):
     userId = event.source.sender_id
+    text = event.message.text
     profile = line_bot_api.get_profile(userId)
 
-    results = db_access.findImageWithCaption(userId, res) 
+    results = db_access.findImageWithCaption(userId, text) 
     if results:
         line_bot_api.reply_message(
             event.reply_token,
@@ -91,7 +92,7 @@ def processTextMessage(event):
     else:
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text="@" + profile.display_name + ": " + event.message.text))
+            TextSendMessage(text="@" + profile.display_name + ": " + text))
 
         #line_bot_api.push_message( userId, TextSendMessage(text='push yo, ' + profile.display_name))
 
