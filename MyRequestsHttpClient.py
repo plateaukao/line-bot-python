@@ -1,4 +1,5 @@
 import os
+import requests
 from linebot.http_client import (
         HttpClient, RequestsHttpClient,RequestsHttpResponse
 )
