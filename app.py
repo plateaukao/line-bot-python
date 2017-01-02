@@ -24,6 +24,10 @@ import msocr
 import image_management
 import db_access
 
+from TemplateMessage import (
+    ConfirmTemplateMessage,MessageAction
+)
+
 from flask import Flask, request, abort
 from linebot import (
     LineBotApi, WebhookParser

@@ -1,5 +1,6 @@
-from cloudinary import uploader, CloudinaryImage
-
+from cloudinary import (
+   uploader, CloudinaryImage
+)
 
 def upload(user_id, file_name):
     response = uploader.upload(file_name, tags=user_id)
