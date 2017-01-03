@@ -33,7 +33,8 @@ from linebot.exceptions import (
 )
 from linebot.models import (
     PostbackEvent, MessageEvent,
-	TextMessage, TextSendMessage, ImageMessage, ImageSendMessage,
+    TextMessage, TextSendMessage, ImageMessage, ImageSendMessage,
+    PostbackTemplateAction, MessageTemplateAction,
     SourceUser
 )
 
@@ -125,6 +126,29 @@ def handle_content_message(event):
             TextSendMessage(text="can't find words"))
         return
 
+    # show confirm message
+    confirm_template = ConfirmTemplate(text='OCR: ' + res, actions=[
+        PostbackTemplateAction(label='Save',
+                               data='saveImage@#' + event.message.id + '@#' + res),
+        MessageTemplateAction(label='No', text='No!'),
+    ])
+
+    template_message = TemplateSendMessage(
+        alt_text='Save image is not supported', template=confirm_template)
+    line_bot_api.reply_message(event.reply_token, template_message)
+
+@handler.add(PostbackEvent)
+def handle_postback(event):
+    print event.postback.data
+    info = event.postback.data.split("@#")
+    if info[0] == "saveImage":
+        saveImage(info[1], info[2])
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='saved'))
+
+def saveImage(messageId, caption):
+    message_content = line_bot_api.get_message_content(messageId)
+    image_binary = message_content.content
+
     # save image to cloudinary
     fp = open("tmp_img", "wb")
     fp.write(image_binary)
@@ -132,18 +156,7 @@ def handle_content_message(event):
     url, imageId = image_management.upload(userId, "tmp_img")
 
     # save image to db
-    db_access.addImage(userId, imageId, url, res) 
-
-    # send ocr text message
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=res)
-    )
-
-@handler.add(PostbackEvent)
-def handle_postback(event):
-    if event.postback.data == 'ping':
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='pong'))
+    db_access.addImage(userId, imageId, url, res)
 
 if __name__ == "__main__":
     arg_parser = ArgumentParser(
