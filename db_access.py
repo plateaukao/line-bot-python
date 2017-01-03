@@ -14,4 +14,4 @@ def addImage(userId, imageId, url, caption):
     image_collection.insert_one(record)
 
 def findImageWithCaption(userId, caption):
-    return image_collection.find({'caption': {'$regex': caption}})
+    return image_collection.find({'caption': re.compile(caption, re.IGNORECASE)})

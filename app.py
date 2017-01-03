@@ -129,7 +129,7 @@ def handle_content_message(event):
         return
 
     # show confirm message
-    confirm_template = ConfirmTemplate(text='OCR: ' + res, actions=[
+    confirm_template = ConfirmTemplate(text='辨識結果：' + res, actions=[
         PostbackTemplateAction(label='Save',
                                data='saveImage@#' + event.message.id + '@#' + userId + '@#' + res),
         MessageTemplateAction(label='No', text='Discard image.'),
