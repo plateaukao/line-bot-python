@@ -26,19 +26,21 @@ import db_access
 
 from flask import Flask, request, abort
 from linebot import (
-    LineBotApi, WebhookParser
+    LineBotApi, WebhookHandler
 )
 from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, ImageMessage, ImageSendMessage, SourceUser
+    PostbackEvent, MessageEvent,
+	TextMessage, TextSendMessage, ImageMessage, ImageSendMessage,
+    SourceUser
 )
 
 from linebot.http_client import (
-        HttpClient, RequestsHttpClient,RequestsHttpResponse
+        HttpClient, RequestsHttpClient, RequestsHttpResponse
 )
-from linebot.exceptions import ( LineBotApiError)
+from linebot.exceptions import (LineBotApiError)
 
 from MyRequestsHttpClient import MyRequestsHttpClient
 
@@ -49,7 +51,7 @@ channel_secret = "e37fb3dbdef6a04f07cded58e3333f38"
 channel_access_token = "IlQKA+p8nuk2tQWFI2rAUmIT/6Eewpse8o3wtSY3g0vqmO9XiygI+UlnsxvpwDqQL1DpmHQ3mS0YvIOmSQkeqohdLzs1JYGiwERQ9hi/k9NP0wQJvSlpJ1o8NqbXyXudoHodBOFCvlWR/jNnIhnYXgdB04t89/1O/w1cDnyilFU="
 
 line_bot_api = LineBotApi(channel_access_token, http_client=MyRequestsHttpClient)
-parser = WebhookParser(channel_secret)
+handler = WebhookHandler(channel_secret)
 
 @app.route("/")
 def main():
@@ -65,21 +67,14 @@ def callback():
 
     # parse webhook body
     try:
-        events = parser.parse(body, signature)
+        handler.handle(body, signature)
     except InvalidSignatureError:
         abort(400)
 
-    for event in events:
-        if not isinstance(event, MessageEvent):
-            continue
-        if isinstance(event.message, TextMessage):
-            processTextMessage(event)
-        elif isinstance(event.message, ImageMessage):
-            processImageMessage(event)
-
     return 'OK'
 
-def processTextMessage(event):
+@handler.add(MessageEvent, message=TextMessage)
+def handle_text_message(event):
     userId = event.source.sender_id
     text = event.message.text
 
@@ -113,7 +108,8 @@ def processTextMessage(event):
 
         #line_bot_api.push_message( userId, TextSendMessage(text='push yo, ' + profile.display_name))
 
-def processImageMessage(event):
+@handler.add(MessageEvent, message=ImageMessage)
+def handle_content_message(event):
     userId = event.source.sender_id
 
     # get binary
@@ -143,6 +139,11 @@ def processImageMessage(event):
         event.reply_token,
         TextSendMessage(text=res)
     )
+
+@handler.add(PostbackEvent)
+def handle_postback(event):
+    if event.postback.data == 'ping':
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='pong'))
 
 if __name__ == "__main__":
     arg_parser = ArgumentParser(
