@@ -34,6 +34,7 @@ from linebot.exceptions import (
 from linebot.models import (
     PostbackEvent, MessageEvent,
     TextMessage, TextSendMessage, ImageMessage, ImageSendMessage,
+    ConfirmTemplate,
     PostbackTemplateAction, MessageTemplateAction,
     SourceUser
 )
