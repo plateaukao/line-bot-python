@@ -131,8 +131,8 @@ def handle_content_message(event):
     # show confirm message
     confirm_template = ConfirmTemplate(text='OCR: ' + res, actions=[
         PostbackTemplateAction(label='Save',
-                               data='saveImage@#' + event.message.id + '@#' + res),
-        MessageTemplateAction(label='No', text='No!'),
+                               data='saveImage@#' + event.message.id + '@#' + userId + '@#' + res),
+        MessageTemplateAction(label='No', text='Discard image.'),
     ])
 
     template_message = TemplateSendMessage(
@@ -144,10 +144,10 @@ def handle_postback(event):
     print event.postback.data
     info = event.postback.data.split("@#")
     if info[0] == "saveImage":
-        saveImage(info[1], info[2])
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='saved'))
+        saveImage(info[1], info[2], info[3])
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='Image is saved.'))
 
-def saveImage(messageId, caption):
+def saveImage(messageId, userId, caption):
     message_content = line_bot_api.get_message_content(messageId)
     image_binary = message_content.content
 
@@ -158,7 +158,7 @@ def saveImage(messageId, caption):
     url, imageId = image_management.upload(userId, "tmp_img")
 
     # save image to db
-    db_access.addImage(userId, imageId, url, res)
+    db_access.addImage(userId, imageId, url, caption)
 
 if __name__ == "__main__":
     arg_parser = ArgumentParser(
