@@ -142,12 +142,26 @@ def handle_content_message(event):
 @handler.add(PostbackEvent)
 def handle_postback(event):
     #print event.postback.data
+    userId = event.source.sender_id
+    # 0:action, 1: messageId, 2: userId, 3: caption
     info = event.postback.data.split("@#")
+
+    # check if userId is the same
+    if userId != info[2]:
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='The image is not uploaded by you.'))
+        return
+
     if info[0] == "saveImage":
-        saveImage(info[1], info[2], info[3])
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='Image is saved.'))
+        if saveImage(info[1], info[2], info[3]) == "savedBefore":
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='Saved before.'))
+        else:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='Image is saved.'))
 
 def saveImage(messageId, userId, caption):
+    # check if image is already saved, if so, return saved
+    if db_access.findImageWithMessageId(messageId):
+        return "savedBefore"
+
     message_content = line_bot_api.get_message_content(messageId)
     image_binary = message_content.content
 
