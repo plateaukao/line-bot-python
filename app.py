@@ -141,7 +141,7 @@ def handle_content_message(event):
 
 @handler.add(PostbackEvent)
 def handle_postback(event):
-    print event.postback.data
+    #print event.postback.data
     info = event.postback.data.split("@#")
     if info[0] == "saveImage":
         saveImage(info[1], info[2], info[3])
