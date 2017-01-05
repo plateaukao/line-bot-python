@@ -159,7 +159,7 @@ def handle_postback(event):
 
 def saveImage(messageId, userId, caption):
     # check if image is already saved, if so, return saved
-    if db_access.findImageWithMessageId(messageId):
+    if db_access.findImageWithMessageId(messageId).count() > 0:
         return "savedBefore"
 
     message_content = line_bot_api.get_message_content(messageId)
