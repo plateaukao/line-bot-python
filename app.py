@@ -159,10 +159,8 @@ def handle_postback(event):
 
 def saveImage(messageId, userId, caption):
     # check if image is already saved, if so, return saved
-    print "messageId",messageId
     if db_access.findImageWithMessageId(messageId).count() > 0:
         return "savedBefore"
-    print "findImageWithMessageId:",db_access.findImageWithMessageId(messageId).count()
 
     message_content = line_bot_api.get_message_content(messageId)
     image_binary = message_content.content
@@ -174,7 +172,7 @@ def saveImage(messageId, userId, caption):
     url, imageId = image_management.upload(userId, "tmp_img")
 
     # save image to db
-    db_access.addImage(userId, imageId, url, caption)
+    db_access.addImage(userId, imageId, url, caption, messageId)
 
 if __name__ == "__main__":
     arg_parser = ArgumentParser(
