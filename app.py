@@ -53,7 +53,7 @@ app = Flask(__name__)
 channel_secret = "e37fb3dbdef6a04f07cded58e3333f38"
 channel_access_token = "IlQKA+p8nuk2tQWFI2rAUmIT/6Eewpse8o3wtSY3g0vqmO9XiygI+UlnsxvpwDqQL1DpmHQ3mS0YvIOmSQkeqohdLzs1JYGiwERQ9hi/k9NP0wQJvSlpJ1o8NqbXyXudoHodBOFCvlWR/jNnIhnYXgdB04t89/1O/w1cDnyilFU="
 
-line_bot_api = LineBotApi(channel_access_token, http_client=MyRequestsHttpClient)
+line_bot_api = LineBotApi(channel_access_token)
 handler = WebhookHandler(channel_secret)
 
 @app.route("/")
