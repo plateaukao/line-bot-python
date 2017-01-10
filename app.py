@@ -35,7 +35,7 @@ from linebot.models import (
     PostbackEvent, MessageEvent,
     TextMessage, ImageMessage,
     TextSendMessage, ImageSendMessage, TemplateSendMessage,
-    ConfirmTemplate,
+    ConfirmTemplate, ButtonsTemplate,
     PostbackTemplateAction, MessageTemplateAction,
     SourceUser
 )
@@ -45,7 +45,7 @@ from linebot.http_client import (
 )
 from linebot.exceptions import (LineBotApiError)
 
-from MyRequestsHttpClient import MyRequestsHttpClient
+#from MyRequestsHttpClient import MyRequestsHttpClient
 
 app = Flask(__name__)
 
@@ -129,9 +129,11 @@ def handle_content_message(event):
         return
 
     # show confirm message
-    confirm_template = ConfirmTemplate(text='辨識結果：' + res, actions=[
-        PostbackTemplateAction(label='Save',
-                               data='saveImage@#' + event.message.id + '@#' + userId + '@#' + res),
+    confirm_template = ButtonsTemplate(title='辨識結果',text =  res, actions=[
+        PostbackTemplateAction(label='Save Privately',
+                               data='saveImage@#' + event.message.id + '@#' + userId + '@#' + res + '@#' + str(0)),
+        PostbackTemplateAction(label='Save Publicly',
+                               data='saveImagePu@#' + event.message.id + '@#' + userId + '@#' + res + '@#' + str(1)),
         MessageTemplateAction(label='No', text='Discard image.'),
     ])
 
@@ -143,7 +145,7 @@ def handle_content_message(event):
 def handle_postback(event):
     #print event.postback.data
     userId = event.source.sender_id
-    # 0:action, 1: messageId, 2: userId, 3: caption
+    # 0:action, 1: messageId, 2: userId, 3: caption, 4: public or not
     info = event.postback.data.split("@#")
 
     # check if userId is the same
@@ -152,12 +154,12 @@ def handle_postback(event):
         return
 
     if info[0] == "saveImage":
-        if saveImage(info[1], info[2], info[3]) == "savedBefore":
+        if saveImage(info[1], info[2], info[3], int(info[4])) == "savedBefore":
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='Saved before.'))
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='Image is saved.'))
 
-def saveImage(messageId, userId, caption):
+def saveImage(messageId, userId, caption, isPublic):
     # check if image is already saved, if so, return saved
     if db_access.findImageWithMessageId(messageId).count() > 0:
         return "savedBefore"
@@ -172,7 +174,7 @@ def saveImage(messageId, userId, caption):
     url, imageId = image_management.upload(userId, "tmp_img")
 
     # save image to db
-    db_access.addImage(userId, imageId, url, caption, messageId)
+    db_access.addImage(userId, imageId, url, caption, messageId, isPublic)
 
 if __name__ == "__main__":
     arg_parser = ArgumentParser(
