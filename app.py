@@ -133,12 +133,12 @@ def handle_content_message(event):
         PostbackTemplateAction(label='Save Privately',
                                data='saveImage@#' + event.message.id + '@#' + userId + '@#' + res + '@#' + str(0)),
         PostbackTemplateAction(label='Save Publicly',
-                               data='saveImagePu@#' + event.message.id + '@#' + userId + '@#' + res + '@#' + str(1)),
+                               data='saveImage@#' + event.message.id + '@#' + userId + '@#' + res + '@#' + str(1)),
         MessageTemplateAction(label='No', text='Discard image.'),
     ])
 
     template_message = TemplateSendMessage(
-        alt_text='Save image is not supported', template=confirm_template)
+        alt_text='Save image is only supported on mobile.', template=confirm_template)
     line_bot_api.reply_message(event.reply_token, template_message)
 
 @handler.add(PostbackEvent)
