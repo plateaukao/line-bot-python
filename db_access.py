@@ -14,9 +14,8 @@ def addImage(userId, imageId, url, caption, messageId=None, isPublic=0):
     image_collection.insert_one(record)
 
 def findImageWithCaption(userId, caption):
-    items = image_collection.find({'userId':userId, 'caption': re.compile(caption, re.IGNORECASE)})
-    public_items = image_collection.find({'userId':{'$ne': userId}, 'caption': re.compile(caption, re.IGNORECASE), 'isPublic':1})
-    return items.extend(public_items)
+    items = image_collection.find({'$or' :[{'userId':userId, 'caption': re.compile(caption, re.IGNORECASE)},
+        {'userId':{'$ne': userId}, 'caption': re.compile(caption, re.IGNORECASE), 'isPublic':1}]})
 
 def findImageWithMessageId(messageId):
     return image_collection.find({'messageId': messageId})
